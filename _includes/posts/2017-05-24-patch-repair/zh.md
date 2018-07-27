@@ -4,4 +4,4 @@
 
 下图是从微软security官网上爬去下来的数据绘制成的图片，纵坐标时不同版本windows在各年度发布的补丁数量，此图最初时是为了证明这项工作的意义，很有讽刺意味的一件事。
 
-![bug-years](https://github.com/mcgrady1/mcgrady1.github.io/tree/master/img/in-post/post-patch-repair/bug-years.png)
+![bug-years](/img/in-post/post-patch-repair/bug-years.png)

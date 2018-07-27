@@ -5,7 +5,7 @@ subtitle:   ""
 date:       2017-05-24 12:00:00
 author:     "Mcgrady"
 header-img: ""
-header-img:   "img/in-post/post-path-repair/repair-bg.jpg"
+header-img:   "img/in-post/post-patch-repair/repair-bg.jpg"
 header-mask:  0.3
 catalog:      true
 multilingual: true
