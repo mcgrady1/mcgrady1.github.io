@@ -1,17 +1,17 @@
 ---
 layout:       post
-title:        "饿了么的 PWA 升级实践"
-subtitle:     "Upgrading Ele.me to Progressive Web App"
-date:         2017-07-12 12:00:00
-author:       "Hux"
-header-img:   "img/in-post/post-eleme-pwa/eleme-at-io.jpg"
+title:        "Deep Learning和Fuzzing的那些事"
+subtitle:     "Deep Learning and Fuzzing"
+date:         2018-07-15 12:00:00
+author:       "Mcgrady"
+header-img:   "img/in-post/post-eleme-pwa/deep-learning.png"
 header-mask:  0.3
 catalog:      true
 multilingual: true
 tags:
-    - 前端开发
-    - JavaScript
-    - PWA
+    - Deep Learning
+    - Fuzzing
+    - Paper Summary
 ---
 
 <!-- Chinese Version -->
