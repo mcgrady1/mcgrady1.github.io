@@ -32,8 +32,11 @@ VM劫持所有的对内存的操作，并根据用户定制的内存策略来提
 
 ```c++
 void foo(char *p) { // p is a 4-bytes input
+
   char v = *p; // *p is a 1-byte input
+
   return;
+
 }
 ```
 
@@ -55,7 +58,6 @@ void foo(char *p) { // p is a 4-bytes input
 9: ret 0
 [...]
 ```
-
 最重要的部分是，第4行中，[ebp+8]是间接寻址，会对内存进行访问，且根据栈的结构，这里应该是函数的第一个输入参数，如果有第二个，则应该在ebp+12处。因为没有给foo函数任何的输入参数，所以[ebp+8]是没有被分配和初始化的。因此microX在一个新的地址x重新分配一个对程序不可见的外部内存，接着，microX将ebp+8和x两个内存联系起来，将ebp+8的地址值用x的地址值进行替换，并将4字节的的参数值存放在[x]中。
 
 ```
@@ -84,7 +86,6 @@ void foo(char *p) { // p is a 4-bytes input
 23: Number of Warnings: 0
 24: Number of Errors: 0
 ```
-
 上面是microX生成的内存访问报告，可以看到，ebp的初始值为 0x001ef988，eip的初始值为0x72b51005
 对上面的内容我存在一个疑问，这两个初始值是怎样得到的。这里先忽略这个问题。第一次对内存的访问地址为 0x001ef990，即ebp+8，如上面所说，当使用随机生成模式的时候，microX会返回一个随机生成的值00201478，此时还不知道这个返回值会作为一个指针使用，为了预防，将这个值记录到known input address 列表里面，这四个字节被储存在一个4字节的buffer中，在本例中被定为到00201440这个地址处，从此刻起，所有对0x001ef990处的访问都会被映射到0x00201440，该地址是程序不可见的，而被microX控制的外部地址，因为0x00201440从没有在程序中的任何寄存器中出现过。
 
@@ -95,17 +96,13 @@ void foo(char *p) { // p is a 4-bytes input
 #### Memory Access
 
 MicroX重定向所有的内存访问操作是怎样实现的呢？首先动态的解释每条将执行的x86指令，并将内存操做相关的指令拆分成微指令序列集合，将其中的内存访问地址进行替换。举例说，对于x86指令
-
 ```asm
 mov eax，[ecx]
 ```
-
 该指令的含义是：
-
 - 使用eax寄存器中的值作为地址
 - 获取[eax]地址中的值
 - 将该值储存到寄存器eax中
-
 这些操作被microX重写成型如西面代码的新指令
 
 ```
@@ -117,14 +114,10 @@ PREMemoryAccessCallBack
 mov eax, [EffectiveAddress]
 ...
 ```
-
 Generate是一个x86中的宏定义（应该类似于c语言，只是简单的替换操作），计算哪些地址被当前的指令所访问。然后将这些地址存储到一个变量Effectiveaddress中，在 Effectiveaddress被访问之前需要有一个回调函数PREMemoryAccess，该回调函数检查当前的内存访问策略来决定当前的 Effectiveaddress如何访问
-
 - 不处理
 - 用一个新的地址进行替换，如前面的foo函数一样，如果此处为输入参数就需要对地址进行替换。microx会自动在扩展内存中分配区域，并保存一个从effective地址到扩展内存地址的映射。并将effective的值替换成external address的值。被测试代码是没有感知到该替换操作的。
-
 接下来，x86指令执行mov eax，[effectiveaddress]的操作，该操作很好的保证了指令的语义信息不被改变，也就是说对进程的eflags寄存器是没有影响的。
-
 
 想强调的是，执行中的指令是不会知道external memory的存在的，例如在上面的例子中，ecx中的值并没有被替换成external mamory中的值，因为，microX并不知道ecx中的值的来源，和程序在后面需要使用ecx中的值做什么操作，改变ecx中的值可能有负面的影响。
 
