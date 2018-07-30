@@ -36,7 +36,6 @@ void foo(char *p) { // p is a 4-bytes input
   char v = *p; // *p is a 1-byte input
 
   return;
-
 }
 ```
 
