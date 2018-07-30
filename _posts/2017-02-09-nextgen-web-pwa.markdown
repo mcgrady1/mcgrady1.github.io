@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      ""
-subtitle:   "<MicroX> Paper Summary"
+subtitle:   "Micro Execution"
 date:       2017-03-19 12:00:00
 author:     "Mcgrady"
 header-img: "img/in-post/post-microx/gandam.jpg"
@@ -11,17 +11,32 @@ tags:
     - Symbolic Execution
     - Virtual Execution
     - Testing
+    - Paper Summary
 ---
 
 > MicroX是我在做Memroy Fuzzing时主要参考的几篇文章之一，这里是我对这篇文章主要思想的之前的整理。
+>
 > Micro execution is the ability to execute any code fragment without a user-provided test driver or input data. The user simply identifies a function or code location in an exe or dll. A runtime Virtual Machine (VM) customized for testing purposes then starts executing the code at that location, catches all memory operations before they occur, allocates memory on-the-fly in order to perform those read/write memory operations, and provides input values according to a customizable memory policy, which defines what read memory accesses should be treated as inputs.
+>
 > 以下只用作自我反思，请勿转载。
 
 ## what is *micro execution*?
-![base-idea](/img/in-post/post-microx/base_idea.jpg)
+"The user selects a function of code location in any executable file, such as an exe or a dll on a Windows machine. A
+special runtime Virtual Machine (VM) customized for testing purposes then starts executing the code at that location.
+The VM hijacks all memory operations, and provides input values according to a customizable memory policy."
+
 VM劫持所有的对内存的操作，并根据用户定制的内存策略来提供函数输入值。上面还提供了一个示例策略，这个策略描述的意思对未初始化的函数参数可以使用任意随机值，如果地址值也是输入参数并通过随机生成取得的，则其地址内的值也随机生成。
-![pointer](/img/in-post/post-microx/pointer.jpg)
+
+"An input is defined as any value read from an uninitialized function argument, or from a dereferenceof a previous input used as an address (recursive definition)."
+
 假设用户想微执行上面的这段代码（选择随机测试生成模式），首先处理函数内的第一条指令，VM检测到程序想读一个4字节的值作为输入参数（假设运行在32位机器上），因此随机生成一个4字节数字返回给程序（怎样完成的会在下一个小结进行描述）。接下来执行第二行指令，检测到要使用输入参数取得1个字节的值，因此根据之前制定的策略，因为p也是一个输入参数，所以随机生成一个1字节数值并返回给程序。指令执行完成后终止micro过程。
+
+'''c
+void foo(char *p) { // p is a 4-bytes input
+  char v = *p; // *p is a 1-byte input
+  return;
+}
+'''
 
 总结一下，micro execution动态监测到函数的两个输入值，并通过随机生成的方式返回给函数。
 使用这种方式，micro不需要构造任意的测试驱动或者input就可以直接测试程序，测试人员不需要了解内存的构造，只需要指定测试起始指令就可以了。
