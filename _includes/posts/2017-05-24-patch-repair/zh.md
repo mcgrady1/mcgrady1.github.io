@@ -117,28 +117,38 @@ win7：
 
 #### 补丁原理： 
 以下文献是对（热）补丁原理的介绍性资料
+
 1). [Understanding Software Patching](http://queue.acm.org/detail.cfm?id=1053343)
+
 2). Dynamic software updating
  
 #### windows patch格式：
 因为windows补丁文件的格式并未公开，所以下面的资料都只是和补丁压缩文件格式等内容相关的资料。
+
 1). Persist it: using and abusing Microsoft’s fix it patch
+
 2). [Using Catalog Files](https://msdn.microsoft.com/en-us/library/aa741204(v=vs.85).aspx)
+
 3). [Inter-delta dependent containers for content delivery](https://www.google.com/patents/US20070260653)
+
 4). [Catalog Files and Digital Signatures](https://msdn.microsoft.com/en-us/library/windows/hardware/ff537872(v=vs.85).aspx)
+
 5). [Using Binary Delta Compression (BDC) Technology to Update Windows Operating Systems](http://www.microsoft.com/en-us/download/details.aspx?id=1562)
  
 #### 补丁安全性测试：
 1). KATCH：High-Coverage Testing of Software Patches,
 使用符号执行对Patch代码进行高覆盖率测试，需要对源码进行比对分析，对Patch中新添加的可执行代码进行完整的覆盖测试。
+
 2). How do fixes become bugs,
 利用Coverage和Disruption指标对Patch进行评价测试
 - Coverage：对所有触发bug的输入是否都能正常处理。
 - Disruption：Patch是否引入了原始程序预期执行逻辑之外的逻辑。
+
 3). Has the bug really been fixed,
 本文针对的是操作系统中的Patch进行测试，主要对Patch编写不当可能引发的错误（并发等问题）在四个操作系统中进行了调研统计，并针对每种类型的错误出现的原因和修改意见做出了说明。
  
 #### 补丁修复模式类：
 1). Toward an understanding of bug fix patterns
+
 2). Automatically patching errors in deployed software
  

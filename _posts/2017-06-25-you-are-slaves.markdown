@@ -8,7 +8,6 @@ header-img: ""
 header-img:   "img/in-post/post-patch-repair/repair-bg.jpg"
 header-mask:  0.3
 catalog:      true
-multilingual: true
 tags:
     - Patch Compare
     - Auto Repair
