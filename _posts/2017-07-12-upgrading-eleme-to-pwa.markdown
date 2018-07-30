@@ -7,7 +7,6 @@ author:       "Mcgrady"
 header-img:   "img/in-post/post-eleme-pwa/deep-learning.png"
 header-mask:  0.3
 catalog:      true
-multilingual: true
 tags:
     - Deep Learning
     - Fuzzing
@@ -25,3 +24,5 @@ tags:
     {% capture about_en %}{% include posts/2017-07-12-upgrading-eleme-to-pwa/en.md %}{% endcapture %}
     {{ about_en | markdownify }}
 </div> -->
+
+<!-- multilingual: true -->
