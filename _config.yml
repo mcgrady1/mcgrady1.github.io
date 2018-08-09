@@ -90,7 +90,7 @@ service-worker: true
 
 
 # Projects that i like
-Projects: [
+friends: [
     {
     #     title: "Su",
     #     href: "http://su.gallery/"
