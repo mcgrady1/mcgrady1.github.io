@@ -233,7 +233,7 @@ FKP结构中包含四部分：
 
 另外还有一点需要注意，rgb中可能会有几个元素指向同一个chpx，猜测应该是不同点共享同一个特性。我猜测通过FKP就可以定位段落中所有属性，包括数据流的相对位置信息，那么真的是这样的吗，请继续往下看。
 
-## DataStream
+#### DataStream
 
 > Format of the Data Stream, **embedded objects-native data**  Word embedded object structures are sequentially concatenated if the document contains embedded objects. **huge PAPXs** The grpprls from PAPXs which are too large to fit in an FKP are sequentially concatenated as necessary. **pictures** Word picture structures are sequentially concatenated if the document contains pictures.
 
@@ -264,7 +264,7 @@ sprm两字节的长度中具体包含以下四项数据：
 
 按照官方说明，后面紧接着的部分应该就是图片数据流了：
 
-## Picture：
+#### Picture
 
 先看两端官方文档中关于图片识别的说明，图片及其识别结构在数据流中保存形式：
 
