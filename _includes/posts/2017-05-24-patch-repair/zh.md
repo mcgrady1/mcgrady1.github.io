@@ -138,7 +138,6 @@ win7：
 - Has the bug really been fixed, 本文针对的是操作系统中的Patch进行测试，主要对Patch编写不当可能引发的错误（并发等问题）在四个操作系统中进行了调研统计，并针对每种类型的错误出现的原因和修改意见做出了说明。
  
 #### 补丁修复模式类：
-1). Toward an understanding of bug fix patterns
-
-2). Automatically patching errors in deployed software
+- Toward an understanding of bug fix patterns
+- Automatically patching errors in deployed software
  
