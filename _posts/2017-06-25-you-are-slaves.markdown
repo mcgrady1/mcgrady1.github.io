@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Patch and Auto Repair"
-subtitle:   ""
+subtitle:   "关于补丁重用的研究思路"
 date:       2017-05-24 12:00:00
 author:     "Mcgrady"
 header-img: ""
