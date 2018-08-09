@@ -41,16 +41,13 @@ Sectors 简单的以其在文件中的顺序列举，一个扇区的索引（从
 #### 扇区链与扇区标识链
 
 用于存储流数据的所有Sectors的列表叫做扇区链（Sector Chain）。这些Sectors可以是无序的。因此用于指定一个流的Sectors的顺序的SID数组就称为SID chain。一个SID chain总是以End Of Chain SID（－2）为结束标记。
-
 例：一个流由4个Sector组成，其SID链为[1, 6, 3, 5, –2]。
 
 ![img](http://p.blog.csdn.net/images/p_blog_csdn_net/liangjingbo/EntryImages/20080903/1633560621745458750.GIF)
 
 流的SID链是通过扇区配置表构建的（见4.2节），但短流和以下两种内部流除外：
-
-1. 主扇区配置表，其从自身构建SID链（每个扇区包含下一个扇区的SID）。
-
-2. 扇区配置表，其通过主扇区配置表构建SID链。
+- 主扇区配置表，其从自身构建SID链（每个扇区包含下一个扇区的SID）。
+- 扇区配置表，其通过主扇区配置表构建SID链。
 
 ## 复合文档头
 
@@ -68,15 +65,15 @@ Sectors 简单的以其在文件中的顺序列举，一个扇区的索引（从
 | 30     | 2    | 复合文档中sector的大小(ssz)，以2的幂形式存储, sector实际大小为s_size = 2ssz 字节(一般为9即512字节, 最小值为7即128字节) |
 | 32     | 2    | short-sector的大小，以2的幂形式存储, short-sector实际大小为s_s_size = 2sssz 字节(一般为6即64字节，最大为sector的大小) |
 | 34     | 10   | Not used                                 |
-| 44     | 4    | 用于存放扇区配置表（SAT）的sector总数         |
-| 48     | 4    | 用于存放目录流的第一个sector的SID       |
-| 52     | 4    | Not used    |
-| 56     | 4    | 标准流的最小大小(一般为4096 bytes), 小于此值的流即为短流。|
+| 44     | 4    | 用于存放扇区配置表（SAT）的sector总数                  |
+| 48     | 4    | 用于存放目录流的第一个sector的SID                    |
+| 52     | 4    | Not used                                 |
+| 56     | 4    | 标准流的最小大小(一般为4096 bytes), 小于此值的流即为短流。     |
 | 60     | 4    | 用于存放短扇区配置表（SSAT）的第一个sector的SID,或为–2 (End Of Chain SID)如不存在 |
-| 64     | 4    | 用于存放短扇区配置表（SSAT）的sector总数 |
+| 64     | 4    | 用于存放短扇区配置表（SSAT）的sector总数                |
 | 68     | 4    | 用于存放主扇区配置表（MSAT）的第一个sector的SID, 或为–2 (End Of Chain SID) 若无附加的sectors |
-| 72     | 4    | 用于存放主扇区配置表（MSAT）的sector总数 |
-| 76     | 436  | 存放主扇区配置表（MSAT）的第一部分，包含109个SID |
+| 72     | 4    | 用于存放主扇区配置表（MSAT）的sector总数                |
+| 76     | 436  | 存放主扇区配置表（MSAT）的第一部分，包含109个SID            |
 
 #### 字节顺序（Byte Order）
 
@@ -92,10 +89,10 @@ Sectors 简单的以其在文件中的顺序列举，一个扇区的索引（从
 
 存放MSAT的sector的内容：（s_size表示sector的大小）
 
-| Offset  | Size     | Contents                                 |
-| ------- | -------- | ---------------------------------------- |                
-| 0       | s_size-4 | MSAT的(s_size-4) / 4个SID的数组 |
-| s_size-4| 4        | 下一个用于存放MSAT的sector的SID，或－2（已为最后一个）|
+| Offset   | Size     | Contents                           |
+| -------- | -------- | ---------------------------------- |
+| 0        | s_size-4 | MSAT的(s_size-4) / 4个SID的数组         |
+| s_size-4 | 4        | 下一个用于存放MSAT的sector的SID，或－2（已为最后一个） |
 
 最后一个存放MSAT的sector可能未被完全填满，空闲的地方将被填上Free SID(-1)。
 
@@ -103,18 +100,15 @@ Sectors 简单的以其在文件中的顺序列举，一个扇区的索引（从
 
 #### 扇区配置表 
 
-扇区配置表（SAT：sector allocation table）是一个SID数组，包含所有用户流（短流除外）和内部控制流（the short-stream container stream, the short-sector allocation table, and the directory)的SID链。SAT的大小（SID个数）就等于复合文档中所存在的sector的个数。SAT的建立就是通过按顺序读取MSAT中指定的sector中的内容。
+扇区配置表（SAT：sector allocation table）是一个SID数组，包含所有用户流（短流除外）和内部控制流（the short-stream container stream, the short-sector allocation table, and the directory)的SID链。SAT的大小（SID个数）就等于复合文档中所存在的sector的个数。SAT的建立就是通过按顺序读取MSAT中指定的sector中的内容。存放SAT的sector的内容：（s_size表示sector的大小）
 
-存放SAT的sector的内容：（s_size表示sector的大小）
-| Offset  | Size     | Contents                                 |
-| ------- | -------- | ---------------------------------------- |
-| 0       | s_size   | SAT的s_size / 4个SID的数组 |
+| Offset | Size   | Contents              |
+| ------ | ------ | --------------------- |
+| 0      | s_size | SAT的s_size / 4个SID的数组 |
 
 当通过SAT为一个流创建SID链时，SAT数组的当前位置（array index)表示的就是当前的sector，而该位置存放的SID则指向下一个sector。SAT可能在任意位置包含Free SID（－1），这些sector将不被流使用。如果该位置包含End Of Chain SID（－2）表示一个流的结束。如果sector用于存放SAT则为SAT SID（－3），同样用于存放MSAT则为MSAT SID（－4）。一个SID链的起点从用户流的目录入口（directory entry，见6.2节）或头（内部控制流）或目录流本身获得。
 
-例：一个复合文档包含一个用于存放SAT的sector（sector 1）和2个流。
-
-Sector 1的内容如下图：
+例：一个复合文档包含一个用于存放SAT的sector（sector 1）和2个流。Sector 1的内容如下图：
 
 ![img](http://p.blog.csdn.net/images/p_blog_csdn_net/liangjingbo/EntryImages/20080903/2.GIF)
 
@@ -136,9 +130,9 @@ short_s_pos(SID) = SID ∙ 2 sssz = 5 ∙ 26 = 5 ∙ 64 = 320.
 
 短扇区配置表（SSAT：short-sector allocation table）是一个SID数组，包含所有短流的SID链。与SAT很相似。用于存放SSAT的第一个sector的SID在头中指定，其余的SID链从SAT中获得。存放SSAT的sector的内容：（s_size表示sector的大小）
 
-| Offset  | Size     | Contents                                 |
-| ------- | -------- | ---------------------------------------- |
-| 0       | s_size   | SSAT的s_size / 4个SID的数组 |
+| Offset | Size   | Contents               |
+| ------ | ------ | ---------------------- |
+| 0      | s_size | SSAT的s_size / 4个SID的数组 |
 
 SSAT的用法与SAT类似，不同的是其SID链引用的是short-sector。
 
@@ -163,16 +157,16 @@ DIRECTORY ENTRY 3
 ![img](http://p.blog.csdn.net/images/p_blog_csdn_net/liangjingbo/EntryImages/20080903/1.GIF)
 
 例：以上面的图为例
-1.根仓库入口描述根仓库，它不是任何仓库入口的成员，因此无需构建红黑树。
-2.根仓库的所有直接成员(“Storage1”, “Storage2”, “Stream1”, “Stream2”, “Stream3”, 和 “Stream4”)将组成一棵红黑树，其根节点的DID存放于根仓库入口中。
-3.仓库Storage1只有一个成员Stream1，Stream1构成一棵红黑树，此树只有一个节点。Storage1的目录入口包含Stream1的DID。
-4. 仓库Storage2包含3个成员“Stream21”, “Stream22”, 和“Stream23”。这3个成员将构建一棵红黑树，其根节点的DID存放于Storage2的目录入口中。
+- 根仓库入口描述根仓库，它不是任何仓库入口的成员，因此无需构建红黑树。
+- 根仓库的所有直接成员(“Storage1”, “Storage2”, “Stream1”, “Stream2”, “Stream3”, 和 “Stream4”)将组成一棵红黑树，其根节点的DID存放于根仓库入口中。
+- 仓库Storage1只有一个成员Stream1，Stream1构成一棵红黑树，此树只有一个节点。Storage1的目录入口包含Stream1的DID。
+- 仓库Storage2包含3个成员“Stream21”, “Stream22”, 和“Stream23”。这3个成员将构建一棵红黑树，其根节点的DID存放于Storage2的目录入口中。
 
 这种存放规则将导致每个目录入口都包含3个DID：
-1.在包含此目录入口的红黑树中，此目录入口的左节点的DID。
-2.在包含此目录入口的红黑树中，此目录入口的右节点的DID。
-3.若此目录入口表示一个仓库，则还包含此仓库的直接成员所组成的另一颗红黑树的根节点的DID。
-在构建红黑树的过程中，一个节点究竟作为左还是右，是通过比较其名字来判断的。一个节点比另一个小是指其名字的长度更短，如长度一样，则逐字符比较。
+- 在包含此目录入口的红黑树中，此目录入口的左节点的DID。
+- 在包含此目录入口的红黑树中，此目录入口的右节点的DID。
+- 若此目录入口表示一个仓库，则还包含此仓库的直接成员所组成的另一颗红黑树的根节点的DID。
+  在构建红黑树的过程中，一个节点究竟作为左还是右，是通过比较其名字来判断的。一个节点比另一个小是指其名字的长度更短，如长度一样，则逐字符比较。
 
 规定：左节点<根节点<右节点。
 
@@ -181,181 +175,111 @@ DIRECTORY ENTRY 3
 一个目录入口的大小严格地为128字节，计算其相对目录流的偏移量的公式为：dir_entry_pos(DID) = DID ∙ 128。
 目录入口的内容：
 
-| Offset  | Size     | Contents                                 |
-| ------- | -------- | ---------------------------------------- |
-| 0       | 64       | 此入口的名字（字符数组）, 一般为16位的Unicode字符,以0结束。(因此最大长度为31个字符) |
-| 64      | 2        | 用于存放名字的区域的大小，包括结尾的0,(如：一个名字右5个字符则此值为(5+1)∙2 = 12) |
-| 66      | 1        | 入口类型: 00H = Empty, 03H = LockBytes (unknown), 01H = User storage, 04H = Property (unknown), 02H = User stream 05H = Root storage |
-| 67      | 1        | 此入口的节点颜色: 00H = Red, 01H = Black |
-| 68      | 4        | 其左节点的DID (若此入口为一个user storage or stream),若没有左节点就为－1 |
-| 72      | 4        | 其右节点的DID (若此入口为一个user storage or stream),若没有右节点就为－1 |
-| 76      | 4        | 其成员红黑树的根节点的DID (若此入口为storage), 其他为－1 |
-| 80      | 16       | 唯一标识符（若为storage）(不重要, 可能全为0) |
-| 96      | 4        | 用户标记(不重要, 可能全为0) |
-| 100     | 8        | 创建此入口的时间标记。大多数情况都不写 |
-| 108     | 8        | 最后修改此入口的时间标记。大多数情况都不写 |
-| 116     | 4        |      若此为流的入口，指定流的第一个sector或short-sector的SID,若此为根仓库入口，指定短流存放流的第一个sector的SID,其他情况，为0 |  
-| 120     | 4        | 若此为流的入口，指定流的大小（字节）若此为根仓库入口，指定短流存放流的大小（字节）其他情况，为0 |
-| 124     | 4        | Not used  时间标记(time stamp) 是一个符号的64位的整数，表示从1601-01-01 00:00:00开始的时间值 |
+| Offset | Size | Contents                                 |
+| ------ | ---- | ---------------------------------------- |
+| 0      | 64   | 此入口的名字（字符数组）, 一般为16位的Unicode字符,以0结束。(因此最大长度为31个字符) |
+| 64     | 2    | 用于存放名字的区域的大小，包括结尾的0,(如：一个名字右5个字符则此值为(5+1)∙2 = 12) |
+| 66     | 1    | 入口类型: 00H = Empty, 03H = LockBytes (unknown), 01H = User storage, 04H = Property (unknown), 02H = User stream 05H = Root storage |
+| 67     | 1    | 此入口的节点颜色: 00H = Red, 01H = Black         |
+| 68     | 4    | 其左节点的DID (若此入口为一个user storage or stream),若没有左节点就为－1 |
+| 72     | 4    | 其右节点的DID (若此入口为一个user storage or stream),若没有右节点就为－1 |
+| 76     | 4    | 其成员红黑树的根节点的DID (若此入口为storage), 其他为－1     |
+| 80     | 16   | 唯一标识符（若为storage）(不重要, 可能全为0)             |
+| 96     | 4    | 用户标记(不重要, 可能全为0)                         |
+| 100    | 8    | 创建此入口的时间标记。大多数情况都不写                      |
+| 108    | 8    | 最后修改此入口的时间标记。大多数情况都不写                    |
+| 116    | 4    | 若此为流的入口，指定流的第一个sector或short-sector的SID,若此为根仓库入口，指定短流存放流的第一个sector的SID,其他情况，为0 |
+| 120    | 4    | 若此为流的入口，指定流的大小（字节）若此为根仓库入口，指定短流存放流的大小（字节）其他情况，为0 |
+| 124    | 4    | Not used  时间标记(time stamp) 是一个符号的64位的整数，表示从1601-01-01 00:00:00开始的时间值 |
 
-doc文档header
-这部分的描述大家可能看的很多了，但是对于header之后的文本详细描述信息大家可能还一无所知，本文主要就是针对后面这部分稍显隐秘的内容进行介绍说明，附件中包含了分析使用的样本示例信息（大家有兴趣可以自己分析一下），以及一份doc文档详细格式描述（应该是官方出的）。
+## 几种流数据
 
-worddocument（mainstream）
-该结构是.doc文件中的文本流信息，即完整的文本描述，以样本文件为例，在512的doc文件头之后就是document流，长度为34888，因为doc中数据块（sector）的大小单位在文件头中已经给出了定义，例如样例中是9，对应的大小为512，所以会在document之后进行填充到512的整数倍，即实际上该流是在35840处结束的。
-这个文件的实际大小不符，显然图片是不在这个流中的。大家可能会奇怪在word读取doc的时候是怎样定位图片文件或者格式信息的。
-首先说一下文本流中的编码形式，按照实例doc文件来说，其中的编码是ansi，两个字节描述一个字符，对于其中穿插的格式或者图片等媒体流也用两个字节进行描述。
+#### Word Document（mainstream）
 
-上图是部分ascii码和样式的对应关系，0x00 0x01就用来表示当前位置是一个图片，文本中只有这样一个ascii码，也就是说文本中所有出现图片的地方对应的都是0x00 0x01，那文本又是如何找到该位置对应的图片的呢。为了说明这个问题，下面先看一下word文档中的其他结构。
+MainStream是.doc文件中的文本流信息，即完整的文本描述，以样本文件为例，在512字节的文件头之后就是document流，长度为34888，因为doc中数据块（sector）的大小单位在文件头中已经给出了定义，例如样例中是9，对应的大小为512，所以会在document之后进行填充到512的整数倍，即实际上该流是在35840处结束的。
+文本流中的编码形式，按照实例doc文件来说，其中的编码是ansi，两个字节描述一个字符，对于其中穿插的格式或者图片等媒体流也用两个字节进行描述。在文本流中，图片等数据流的会用对应的ansi码进行表示，ansi码和样式的对应关系，0x00 0x01就用来表示当前位置是一个图片。
 
-第一次查看该文档请跳过该部分，直接进入datastream
-该部分是在后面研究遇到瓶颈后重读官方文档后发现的，之前漏掉了：
-Format of the Main Stream in a Complex File
-FIB Stored at beginning of page 0 of the file. fib.fComplex is set to one. 
+> Q：那文本又是如何找到该位置对应的图片的呢？
 
-Text of body, footnotes, headers stored during last full save ，Text begins at the position recorded in fib.fcMin. 
+为了解决上面的问题，我们首先认识其中的几个描述性结构体。
 
-FKPs for CHPs, PAPs and LVCs 
+首先是 **FKP**，它的作用是记录CHP等结构的特性描述文件
     The first Formatted Disk Page (FKP) begins at a 512-byte boundary after the last byte of text is written. The remaining FKPs are sequentially recorded in the 512-byte pages following the first FKP. The FKPs for Character Properties (CHPs), Paragraph Properties (PAPs), and LVCs are interleaved. Previous versions of Word wrote them in contiguous blocks. The hplcfbte’s of the three flavors (CHP, PAP and LVC) are used to find the relevant FKP of the appropriate type.
-CHP, PAP and LVC的bte结构是为了辅助找到相关的FKP
+**CP (Character Position)** 
 
-Group of SEPXs stored during last full save 
-SEPXs immediately follow the FKPs and are concatenated one after the other. 
-Any text, stored during first fast save Any FKPs stored during first fast save 
-Any SEPXs stored during first fast save Any text, stored during second fast save
-Any FKPs stored during second fast save Any SEPXs stored during second fast save ...
-Any text, stored during nth fast save 
-Any FKPs stored during nth fast save 
-Any SEPXs stored during nth fast save
+> A four-byte integer specifying the position coordinate of a character of text within the logical text stream of a document. 其制定了一个特性在文档的逻辑文本流中的坐标。
 
-（通过上面的对document流的结构描述也就明白了word是怎么对之前版本进行的记录和恢复（注意蓝色部分），所以不断修改的文件本身也会不断变化，这里是否有好的fuzzing策略呢？）
-下面的图片识别部分中提到已经找到了sprmcpiclocation标记位是在stchpxfkps中出现的，那么这里的stchpxfkps结构又是做什么用的呢？
+**FC( File Character position)**
 
-FKPS的作用：
-In Word documents, the fundamental unit of text for which character exception information is kept is the run of exception text, a contiguous sequence of characters stored on disk that all have the same exception properties with respect to their underlying style character properties. Each run would have an entry recorded in a CHPX FKP. If a user never changed the character properties inherited from the styles used in the document and did a complete save of the document, although each of those styles may have different properties, the entire document stream would be one large run of exception text and one CHPX would suffice to describe the character properties of the entire document.
-如果文件第一次保存之后就不再修改则文件中应该只会有一个大的chpxfkp结构来保存所有特性的入口。
+> A four-byte integer which is the byte offset of a character (or other object) from the beginning of a stream of the .doc file. Before a file has been edited (i.e. in a full saved Word document), CPs can be transformed into FCs by adding the FC coordinate of the beginning of a document's text stream to the CP. After a file has been edited (i.e. in a fast-saved Word document), the mapping from CP to FC is recorded in the piece table。FC是一个四字节的整数，指定了一个特性相对doc中一个stream的字节偏移。fc和cp是存在某种转换关系的，这种映射关系存储在piece table中。
 
-The fundamental unit of text for which paragraph properties are recorded is the paragraph. Every paragraph has an entry recorded in a PAPX FKP.
-每个段落都有对应的papx fkp结构来描述。
+FKP是一个512字节大小的结构体，是对doc文件中一个部分的chp或者pap特性的编码，其结构的官方描述如下图所示：
 
-FKPs的结构：
-首先先看一下相关的几个概念辅助理解
-CP (Character Position): 
-A four-byte integer specifying the position coordinate of a character of text within the logical text stream of a document.
-制定了了一个特性在文档的逻辑文本流（为什么叫逻辑文本？）中的坐标。
+![img](img/in-post/post-doc/fkpr.png)
 
-FC( File Character position):
-A four-byte integer which is the byte offset of a character (or other object) from the beginning of a stream of the .doc file. Before a file has been edited (i.e. in a full saved Word document), CPs can be transformed into FCs by adding the FC coordinate of the beginning of a document's text stream to the CP. After a file has been edited (i.e. in a fast-saved Word document), the mapping from CP to FC is recorded in the piece table。
-FC是一个四字节的整数，指定了一个特性相对doc中一个stream的字节偏移。fc和cp是存在某种转换关系的，这种映射关系存储在piece table中。
+这里我们以实际文件中的FKP为例进行说明：
 
-FKP (Formatted disK Page): 
-A data structure that fits in one 512-byte page that encodes either the character properties or the paragraph properties of a certain portion of a Word .doc file. An FKP consists of four components: 
-1) a count of the number of runs or paragraphs described by the page. 
-2) an array of FCs recorded in ascending order demarcating the boundaries between runs or paragraphs that are recorded adjacent to one another in the Word file. 
-3) In character FKPs an array of offsets within the FKP in one to one correspondence with the array of FCs that locate the properties of the run that begins at a particular FC. 
-In LVC FKPs an array of offsets within the FKP in 1-to-1 correspondence with the array of FCs that locate the LVCXs that describe the run that begins at a particular FC.
-In paragraph FKPs an array of BX structures follows the array of FCs in 1 to 1 correspondence with the array of FCs. Each BX begins with an offset that locates the properties of the paragraph that begins at a particular FC. 
-The remainder of the BX contains a PHE structure that encodes information about the height of the paragraph that begins at that FC.
-4) a group of CHPXs if the FKP stores character properties, a group of PAPXs if the FKP stores paragraph and table properties, or a group of LVCXs if the FKP stores paragraph level and numbering cache information.
-To find the CHPX/PAPX corresponding to a particular character in a document, calculate the FC coordinate for that character. Then search through the bin table for the type of property you want to produce, to find the FKP in the document stream whose array of FCs encompasses the FC of the document character. Then search within the FKP to find the index of the largest FC entry that is less than or equal to the FC of the document character. Use this index to look up an offset in the array of offsets (for character FKPs) or look up an offset in the array of BXs (for paragraph FKPs) within the FKP. Add this offset to the beginning address of the FKP in memory. This will be the first byte of the desired CHPX/PAPX.
-FKP是一个512字节大小的结构体，是对doc文件中一个部分的chp或者pap特性的编码：
+![img](img/in-post/post-doc/fkp.png)
 
 FKP结构中包含四部分：
-1）crun是在结构的最后一个字节，即从511开始的一个字节，指定了该结构中包含的特性的数量，该fkp中的对应的是15个。
-2）FKP结构的头部是一个FC结构的列表rgfc，用来区分相邻chp或者pap特性的界限（实际上应该就是这些结构的相对偏移，是否是相对worddocument流的呢？有待验证），但是为什么比crun对了一个16>15，仔细观察可以发现：
 
-多出的那一个fc元素是下一个fkp结构fc列表开头的fc元素的值。
-3）FC列表之后是一个列表，该列表与前面的FC列表一一对应，每个元素的大小为一字节。该列表总的元素的作用是定位每个chpx在FKP结构中的相对偏移。所以一个字节使足够的。
-4）最后保存的是chpx列表如果对应的chpx想要保存在fkp结构中。
-另外还有一点需要注意，rgb中可能会有几个元素指向同一个chpx，猜测应该是不同点共享同一个特性。
+- crun是在结构的最后一个字节，即从511开始的一个字节，指定了该结构中包含的特性的数量，该FKP中的对应的是15个。
+- FKP结构的头部是一个FC结构的列表rgfc，用来区分相邻chp或者pap特性的界限（实际上应该就是这些结构的相对偏移，是否是相对worddocument流的呢？有待验证），但是为什么比crun多了一个16>15，仔细观察可以发现，多出的那一个fc元素是下一个fkp结构fc列表开头的fc元素的值。
 
-总结一下FKP的结构：
+![img](img/in-post/post-doc/fc.png)
 
+- FC列表之后是一个列表，该列表与前面的FC列表一一对应，每个元素的大小为一字节。该列表总的元素的作用是定位每个chpx在FKP结构中的相对偏移。所以一个字节使足够的。
+- 最后保存的是chpx列表如果对应的chpx想要保存在fkp结构中。
 
-上面已经对FKP结构进行了详细的描述，那么word到底是怎样对图片进行定位的。（可以调回到之前的位置继续阅读了）
+另外还有一点需要注意，rgb中可能会有几个元素指向同一个chpx，猜测应该是不同点共享同一个特性。我猜测通过FKP就可以定位段落中所有属性，包括数据流的相对位置信息，那么真的是这样的吗，请继续往下看。
 
-datastream
-Format of the Data Stream
-embedded objects-native data Word embedded object structures are sequentially concatenated if the document contains embedded objects.
-huge PAPXs The grpprls from PAPXs which are too large to fit in an FKP are sequentially concatenated as necessary.
-pictures Word picture structures are sequentially concatenated if the document contains pictures.
-上面的描述说明了datastream中数据排列的限售顺序：
-首先是内嵌对象数据，之前只在docx样本中分析国内前对象的情况，应该是cve-2014-xxxx，有时间转成doc分析一下。
-接着是huge papx列表，下面有对该部分的介绍说明。
-最后是pictures部分，如果文档中包含图片的话，word文档中的所有图片结构都是按照顺序在这段数据流中排列的。
+## DataStream
 
-实例分析
-以附件中的样例文本为例，从35840处开始就是该文档的datastream
-用offvis工具查看样本，以datastream为起始，偏移为0，紧接着的是一个长度为3861的数据是一个叫做Prcdata的结构，对应到官方说明中，这里应该是就是huge chpx（papx）结构的列表：（该样本不包含对象结构，所以没有嵌入对象数据）
+> Format of the Data Stream, **embedded objects-native data**  Word embedded object structures are sequentially concatenated if the document contains embedded objects. **huge PAPXs** The grpprls from PAPXs which are too large to fit in an FKP are sequentially concatenated as necessary. **pictures** Word picture structures are sequentially concatenated if the document contains pictures.
 
-huge CHPXs（papxs）
-CHP：对文件中一些特性的描述性结构体，包括样式信息，图片等
-（对应的还有一个叫做pap的结构：这是对文中段落属性的描述性结构体，为了方便介绍，大家暂时先把文中的chp和pap当成一回事）
-但是在.doc文件中通常是不用CHP结构进行特性描述的，而是使用一个叫做CHPX的压缩结构，该结构实际保存的是一个特性相对于标准CHP结构的差别。
+上面的描述说明了datastream中数据排列的先后顺序，首先是内嵌对象数据，接着是huge papx列表，下面有对该部分的介绍说明，最后是pictures部分，如果文档中包含图片的话，word文档中的所有图片结构都是按照顺序在这段数据流中排列的。
+
+以附件中的样例文本为例，从0x35840，也就是mainstream结尾处开始就是该文档的datastream，用offvis工具查看样本，以datastream为起始，偏移为0，紧接着的是一个长度为3861的数据是一个叫做Prcdata的结构，对应到官方说明中，这里应该是就是huge chpx（papx）结构的列表：（因为我们的样本不包含对象结构，所以没有嵌入对象数据）
+
+**huge CHPXs(papxs)**
+
+> CHP：对文件中一些特性的描述性结构体，包括样式信息，图片等（对应的还有一个叫做pap的结构：这是对文中段落属性的描述性结构体，为了方便介绍，大家暂时先把文中的chp和pap当成一回事），但是在.doc文件中通常是不用CHP结构进行特性描述的，而是使用一个叫做CHPX的压缩结构，该结构实际保存的是一个特性相对于标准CHP结构的差别。
+
 chpx由两部分组成：
-1）cbgrpprl：也可简称为cb，是后面grpprl段的长度。
-2）grpprl：是prl结构的列表或者叫数组，但是因为每个prl的长度不等，所以这里统称做列表。
+
+- cbgrpprl：也可简称为cb，是后面grpprl段的长度。
+- grpprl：是prl结构的列表或者叫数组，但是因为每个prl的长度不等，所以这里统称做列表。
+
 prl结构中包含两部分：
-1）sprm：sprm结构，就是表，图片等特性中相对chp原始结构具体做的一项改变。
-A sprm is an instruction to modify one or more properties within one of the property defining data structures (CHP, PAP, TAP, SEP, or PIC).
-2）operand：操作数。
-简单来说，sprm是一个两字节的操作码，后面跟着操作数，通过这两个数据就可以对chp进行生成，因为要打开文件需要完整的chp，而doc中保存的都是压缩结构，所以这里看成是对结构的还原。
 
-sprm两字节的长度中具体包含以上四项数据：
-1.sgc定义了sprm的类型，到底是chp，pap还是pic类型的特性，说到这里上面需要修正一下，上面直接说是chpx是为了帮助理解，对于不同的特性都有对应的名称，例如pic（picture），chp（character），pap（paragraph）等。
+- sprm：sprm结构，就是表，图片等特性中相对chp原始结构具体做的一项改变。A sprm is an instruction to modify one or more properties within one of the property defining data structures (CHP, PAP, TAP, SEP, or PIC).
+- operand：操作数。简单来说，sprm是一个两字节的操作码，后面跟着操作数，通过这两个数据就可以对chp进行生成，因为要打开文件需要完整的chp，而doc中保存的都是压缩结构，所以这里看成是对结构的还原。
 
+sprm两字节的长度中具体包含以下四项数据：
 
-2.ispmd是对应sgc组中结构中的属性编号，例如如果ispmd为22，则说明当前sprm对应的是sprmPFIntable结构。
-3.spra是后面操作数的长度。
-
-4.fspec是为了说明sprm是否需要特别的处理，例如对于文档中图片（从外部粘贴进文档）会用pic描述，这个fspec会置为1，说明需要到指定的位置区读取图片的详细数据流。
-
-最后总结一下sprm，如上图所示：
-0x2416是一个sprm结构的值，表示修改的是PAP基本结构中的FIntable属性，所需操作数是0或者1个字节。
-一个chpx是对一个chp压缩版本的完整描述，通过chpx就可以对其进行生成还原操作。
-
-下面是文本中一些属性的ascii 码及对应格式的描述，大家有兴趣可以对照样本格式进行验证：
-Text
-The text of the file starts at fib.fcMin and is usually set to the next 128 byte boundary after the end of the FIB. The text in a Word document is ASCII text with the following restrictions (ASCII codes given in decimal):
- Paragraph ends are stored as ASCII 13 (a single <Carriage Return> character). No other occurrences of this character sequence are allowed.
- Hard line breaks which are not paragraph ends are stored as ASCII 11. Other line break or word wrap information is not stored.
-    Hyphens
-     Breaking hyphens are stored as ASCII 45 (normal hyphen code).
-     Non-required hyphens are ASCII 31.
-     Non-breaking hyphens are stored as ASCII 30.
- Non-breaking spaces are stored as 160.
- Normal spaces are ASCII 32.
- Page breaks and Section marks are ASCII 12 (normal form feed); if there's an entry in the section table, it's a section mark, otherwise it's a page break.
- Column breaks are stored as ASCII 14.
- Tab characters are ASCII 9 (normal).
-    Fields
-     Field begin mark which delimits the beginning of a field is ASCII 19.
-    
-     Field end mark which delimits the end of a field is ASCII 21.
-    
-     Field separator ,which marks the boundary between the preceding field code text and following field expansion text within a field, is ASCII 20.
-    
-     Field escape character is the '\' character which also serves as the formula mark.
-    
-     The cell mark which delimits the end of a cell in a table row is stored as ASCII 7 and has the fInTable paragraph property set to fTrue (pap.fInTable==1).
-    
-     The row mark which delimits the end of a table row is stored as ASCII 7 and has the fInTable paragraph property and fTtp paragraph property set to fTrue (pap.fInTable==1 && pap.fTtp==1).红色字体部分就是我们前面提到的属性所具有的指示作用。
-
---------------------------------------------------------------------------------
+- sgc定义了sprm的类型，到底是chp，pap还是pic类型的特性，说到这里上面需要修正一下，上面直接说是chpx是为了帮助理解，对于不同的特性都有对应的名称，例如pic（picture），chp（character），pap（paragraph）等。
+- ispmd是对应sgc组中结构中的属性编号，例如如果ispmd为22，则说明当前sprm对应的是sprmPFIntable结构。
+- spra是后面操作数的长度。
+- fspec是为了说明sprm是否需要特别的处理，例如对于文档中图片（从外部粘贴进文档）会用pic描述，这个fspec会置为1，说明需要到指定的位置区读取图片的详细数据流。
 
 按照官方说明，后面紧接着的部分应该就是图片数据流了：
-PICTURE：
-先看两端官方文档中关于图片识别的说明
-图片及其识别结构在数据流中保存形式：
-A picture is represented in the document text stream as a special character, an ASCII 1 whose CHP has the fSpec bit set to 1. The file location of the picture in the Word binary file is stored in the character's CHP in chp.fcPic. The fcPic is a byte offset into the data stream.
-Beginning at the position recorded in chp.fcPic, a header data structure, the PIC, will be stored. If the picture is a reference to a TIFF file, a Picture file or an Office shape file, the name of the file is recorded immediately following the PIC in a Pascal style string.
-Algorithm to determine the PIC of a picture in a complex file：
-文本中的内容：判定复杂文本中图片的方法
-The picture sprms contained in the prm's grpprl apply to any picture characters within the piece that have their chp.fSpec character ==fTrue. The picture properties for a picture (the PIC described in the Structure Definitions) are derived by fetching the PIC stored with the picture and applying to that PIC any picture sprms linked to the piece containing the picture special character.
+
+## Picture：
+
+先看两端官方文档中关于图片识别的说明，图片及其识别结构在数据流中保存形式：
+
+> A picture is represented in the document text stream as a special character, an ASCII 1 whose CHP has the fSpec bit set to 1. The file location of the picture in the Word binary file is stored in the character's CHP in chp.fcPic. The fcPic is a byte offset into the data stream. Beginning at the position recorded in chp.fcPic, a header data structure, the PIC, will be stored. If the picture is a reference to a TIFF file, a Picture file or an Office shape file, the name of the file is recorded immediately following the PIC in a Pascal style string.
+
+判定复杂文本中图片的方法
+
+> The picture sprms contained in the prm's grpprl apply to any picture characters within the piece that have their chp.fSpec character == fTrue. The picture properties for a picture (the PIC described in the Structure Definitions) are derived by fetching the PIC stored with the picture and applying to that PIC any picture sprms linked to the piece containing the picture special character.
+
 图片判定条件：（经测试修改任何一项都会使当前位置的图片无法被解析）
 当解析到文本的某个位置时，特性编码为1，且chp.fspec = true（1）并且能够连接到保存该图片的位置，即chp.fcpic变量中中保存了该图片数据流所在位置。
-fcPic：4bytes，Offset in data stream pointing to beginning of a picture when character is a picture character (character is 0x01 and chp.fSpec is 1).
-fcData：4bytes，Points to location of picture data, only if chp.fSpec is true.这应该才是图片在文本中的定位吧。
+
+> fcPic：4bytes，Offset in data stream pointing to beginning of a picture when character is a picture character (character is 0x01 and chp.fSpec is 1).
+
+> fcData：4bytes，Points to location of picture data, only if chp.fSpec is true.这应该才是图片在文本中的定位吧。
 
 官方文当中除了上面的描述，信息似乎就断了，但是我们除了知道图片有对应的chp描述结构，数据流，并且数据流肯定在datastream中这些信息外，我们还是无法进行定位。在这里卡了很久，没什么头绪，后面想了一个折中的方法，既然知道datastream中存在图片数据流，我们假设图片在其中是以jpg或者png存储的，按照文件头进行搜索，先将样本中的六张图片进行定位。
 通过上面的这种办法，运气比较好，确实定位了各图片所在的位置：这里需要注意一点，前面的huge chpxs的结尾偏移是0x9b15
@@ -367,122 +291,32 @@ fcData：4bytes，Points to location of picture data, only if chp.fSpec is true.
 4127d  ~   6ff79     jpg格式      chpxfkp[9] - chpx[4]  
 （有一些sprmCPiclocation的值为0，或者偏移在一个图片中间，这种不知道是什么情况，还需要研究）
 从上面的数据可以看到各图片数据流中间是有间隔的，第一感觉chpx很可能是在这些间隔中，但是：
-1）这些间隔的大小都不相同
-2）对于图片特性的chpx目前还不知道长什么样，分析到这里又没有办法继续。
+
+- 这些间隔的大小都不相同
+- 对于图片特性的chpx目前还不知道长什么样，分析到这里又没有办法继续。
 
 重新回到附件中的官方文档说明，搜索和picture相关的信息，查找头绪，搜索结果中看到下面的字段描述：
 
-sprmCPicLocation (opcode 0x6A03) is used ONLY IN CHPX FKPs. This sprm moves the 4-byte operand of the sprm into the chp.fcPic field. It simultaneously sets chp.fSpec to 1.
+>  sprmCPicLocation (opcode 0x6A03) is used ONLY IN CHPX FKPs. This sprm moves the 4-byte operand of the sprm into the chp.fcPic field. It simultaneously sets chp.fSpec to 1.
+
 还有一个标志位是：
 
-大家还记得上面介绍的图片识别算法中提到的两个标记为嘛，就是fcpic和fspec，这两个标记位都有可能：
+![img](img/in-post/post-doc/sprm.png)
+
+大家还记得上面介绍的图片识别算法中提到的两个标记位吗，就是fcpic和fspec，这两个标记位都有可能：
 可能图片对应的chpx根本就不在图片数据流中，因为之前看过另外一篇文档，貌似文本中的所有格式描述信息应该都是顺序排放的，那我们就直接在文本中搜索0x6a03,因为样本文本中是大端，所以应该搜索的是0x03 0x6a
 在偏移6ed7处找到一个，使用offvis查看：
 
+![img](img/in-post/post-doc/offvis1.png)
 
 下图中是对应的位置解析信息：
 
+![img](img/in-post/post-doc/offvis2.png)
 
-对应到sprmcpiclocation标记位的解析，后四位应该是图片的位置：
-00 00 0f 15（这里的位置是相对datastream来说的吗？因为如果直接相对整个文件的偏移肯定是不对的）
-因为datastream的起始为0x8c00，0x8c00+0x0f15=0x9b15
+对应到sprmcpiclocation标记位的解析，后四位应该是图片的位置为00 00 0f 15,因为datastream的起始为0x8c00，0x8c00+0x0f15=0x9b15
 
-可以看到offvis对该处的颜色分界，说明这里应该是一个单独的结构描述的起始，还记得前面介绍过的hug papx结构吗，FF 00就是这个结构的终止处。
-通过另外两个piclocation的值进行了验证，可以确定这个值应该就是相对datastream的偏移。但是第一张图片是从0x9c28处开始的，0x9b15~0x9c28又是社么样的描述性结构呢?这又回到了前面的问题，现在已经知道word定位图片，表格等属性的方法，但是图片间的间隔中到底是怎样描述性格式还是没有解决。
+![img](img/in-post/post-doc/pic1.png)
 
-另外，这里sprmcpiclocation标记位所在的是worddocument中一个叫做FKP的结构，这个的作用是什么呢？
-看到这里请跳转到worddocument部分红字之后的部分。
+可以看到offvis对该处的颜色分界，说明这里应该是一个单独的结构描述的起始，还记得前面介绍过的hug papx结构吗，FF 00就是这个结构的终止处。通过另外两个piclocation的值进行了验证，可以确定这个值应该就是相对datastream的偏移。
 
-请接到这里继续往下看
-查看该图片chpx中剩下的sprm属性（红色框中）好像也没有和图片位置相关的描述：
-
-对比一下不同图片头的这段区域的差别：
-下图为第一张图片和第四张图片前的结构：
-
- 81 15 - 80 3f = d6 | 82 + 44 = c6 | 113 - c6 = 4d
-
-85 0b - 84 6b = a0 | 4c + 44 = 90 | dd - 90 = 4d
-下面两张为第二和第三章图片前的结构，都是png格式的：
-
-51 e9 - 51 33 = b6 | 62 + 44 = a6 | F3 - a6 = 4d
-
-
- 33 e2 - 33 2c = b6 62 + 44 = a6
-可以看到前两个字节应该是和起始位置或者大小相关的一个整数。
-后面的26个字节[“00 00 44 00 64”+21个“00”]（中间穿插了一个整数，第一章图对应的是08，第三章图对应的是0a）基本上都是一样的。
-下面的结构相似度较低，但是从头部这30个字节可以每个图片前面的这部分一定是和图片相关的描述性结构体。
-
-33 2c
-
-回到官方文档中，还有两个和文档相关的结构没有分析过：
-
-对照结构的描述和二进制文件，我个人感觉这里应该是Picture Descriptor结构体（对比前四个字节就可以更加肯定了）：
-
-这里以第三张图片为例
-
-1）lcb = 00 00 33 e2，这里应该就是图片的大小，第三张图片的起始位置是0x16e13，终止位置是0x1a1f4，两者之差就是33 e2。
-2）cbheader应该是header的长度，无符号整数，两个字节，这里值为00 44 和 PIC header的0x44长度刚好对应上。   
-下面的8个字节属于一个叫做METAFILEPICT的结构：
-这些字段只有在后面是一个位图时才会有对应的描述，这里后面跟的是png图，所以x，y都为00，最后的一个是handle。
-
-
-要理解METAFILEPICT这里又需要引入两个概念
-Metafile: A collection of structures that can store an image in an application-independent format. The stored image can be recreated by processing the metafile structures. Also called a vector image, a metafile contains a sequence of drawing commands, object definitions, and configuration settings. The commands, objects, and settings recorded in a metafile can be used to render its contents on a display, output by a printer or plotter, stored in memory, or saved to a file or stream.
-METAFILEPICT: A structure that defines the metafile picture format. METAFILEPICT is used for exchanging metafile data through the clipboard.
-
-name value description
-mfp.mm 00 64 The mapping mode in which the picture is drawn.
-mfp.xext 00 00 The size of the metafile picture for all modes except the MM_ISOTROPIC and MM_ANISOTROPIC modes.
-mfp.yext 00 00 The size of the metafile picture for all modes except the MM_ISOTROPIC and MM_ANISOTROPIC modes. 
-mfp.hmf 00 00 A handle to a memory metafile.
-
-后面的14个字节（0a 00 00 ......）可能是位图类型的一个描述，png位图对应的是0a（2,3），jpg对应的是08（1）
-
-28偏移开始的应该是这个图像在水平方向上到达的范围
-p28 = 0x1924
-30偏移处是垂直方向上到达的范围
-p30 = 0x088e
-当图像被缩放的时候这两个变量会被忽略
-
-32和34偏移处的两个字节，这里是和图像缩放相关的x轴和y轴的比例尺？
-
-图像嵌入文件中如果有裁剪是通过36~44偏移的8个字节进行描述的。
-44~62这18个字节使图片边框规范和整个图片的显示规范。
-62~64这四个字节是图片原点的在x，y轴上的偏移量。
-66偏移处的两个字节未使用。
-
-68开始是一个rgb结构，可以看到这里已经不属于PIC header了，下面这部分结构的长度在文件头中并没有进行定义，这一段字节的含义又是什么？
-PIC header unknown structure picture data
-
-下面需要对unknown structure这部分的结构进行研究：
-官方文档的附录部分有关于图片的一段话：
-After reading the PICF structure from the picture data block, the reader should skip cbMETAHDR bytes (the size of a standard Windows metafile header). It should then compare the next cbWmfXBegin bytes in the picture data block against the bytes in the rgbWmfXBegin array above. If they do not match, the picture is a normal picture—Windows metafile, bitmap or TIFF.
-
-
-WMF
-Microsoft Windows Metafile (WMF) files are used to store vector and bitmap-format image data in memory or in disk files for later playback to an output device. 
-Windows metafile header
-
-格式的默认值和下面图片中的对应位置的值对应不起来：
-
-红线处就是PIC header的结尾，下面按照描述应该是metafile header的开始，但是从第一个word的信息来说和描述是对应不上的
-这里卡了很久，并没有跟任何已知的结构对应上，所以只能纯猜测分析：
-
-0f 00 04 f0 应该是某个结构的起始标志，后面两个字节0x00 62，假设这是一个结构体的大小，用pic header+00 62 =a6
-用picture data前区域的总大小减去这个长度，即f3 - a6 = 4d，下面我们需要判断是否每个图片前面都有一个大小为4d的固定区域，
-对1,2,4三张图片进行了验证，都为4d，
-在用这个数据对没有研究过的5,6两张图片进行研究，看是否能验证这个结果
-第六张图
-
-92 + 44 = d6
-127c - 1159 = 123
-123 - d6 = 4d
-第五张图
-
-44 + 6e = b2
-27fe - 26ff = ff
-ff - b2 = 4d
-上面的两个图片验证了之前的结果，说明picture数据流之前的结构应该就是：
-PIC header（0x44） unknown structure（0f 00 04 f0 length（word）...） unknown structure （length is 0x4d） picture data
-另外在上面图片中标出的位置处应该就是图片在文本流中的顺序，图片是从0开始计数的。
-
+现在已经知道word定位图片，表格等属性的方法，但是图片间的间隔中到底是怎样描述的还是没有解决。这部分的分析内容还在整理中，很快会更新。
