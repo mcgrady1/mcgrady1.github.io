@@ -1,17 +1,15 @@
 ---
-layout:     keynote
-title:      "Service Worker 101「GDG DevFest 2016 北京」"
-subtitle:   "Slides: Service Worker 101, Working Offline and Instant Loading (GDG DevFest 2016 Beijing)"
+layout:     post
+title:      "Compound File Binary File Format"
+subtitle:   ""
 date:       2016-11-20
 author:     "Mcgrady"
-header-img: "img/in-post/post-microx/gandam.jpg"
+header-img: "img/in-post/post-doc/wade.jpg"
 header-mask: 0.3
 catalog:    true
 tags:
-    - Symbolic Execution
-    - Virtual Execution
-    - Testing
-    - Paper Summary
+    - Reverse Engineering
+    - File Format
 ---
 
 
