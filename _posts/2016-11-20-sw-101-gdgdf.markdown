@@ -215,18 +215,18 @@ MainStream是.doc文件中的文本流信息，即完整的文本描述，以样
 
 FKP是一个512字节大小的结构体，是对doc文件中一个部分的chp或者pap特性的编码，其结构的官方描述如下图所示：
 
-![img](img/in-post/post-doc/fkpr.png)
+![img](/img/in-post/post-doc/fkpr.png)
 
 这里我们以实际文件中的FKP为例进行说明：
 
-![img](img/in-post/post-doc/fkp.png)
+![img](/img/in-post/post-doc/fkp.png)
 
 FKP结构中包含四部分：
 
 - crun是在结构的最后一个字节，即从511开始的一个字节，指定了该结构中包含的特性的数量，该FKP中的对应的是15个。
 - FKP结构的头部是一个FC结构的列表rgfc，用来区分相邻chp或者pap特性的界限（实际上应该就是这些结构的相对偏移，是否是相对worddocument流的呢？有待验证），但是为什么比crun多了一个16>15，仔细观察可以发现，多出的那一个fc元素是下一个fkp结构fc列表开头的fc元素的值。
 
-![img](img/in-post/post-doc/fc.png)
+![img](/img/in-post/post-doc/fc.png)
 
 - FC列表之后是一个列表，该列表与前面的FC列表一一对应，每个元素的大小为一字节。该列表总的元素的作用是定位每个chpx在FKP结构中的相对偏移。所以一个字节使足够的。
 - 最后保存的是chpx列表如果对应的chpx想要保存在fkp结构中。
@@ -301,21 +301,21 @@ sprm两字节的长度中具体包含以下四项数据：
 
 还有一个标志位是：
 
-![img](img/in-post/post-doc/sprm.png)
+![img](/img/in-post/post-doc/sprm.png)
 
 大家还记得上面介绍的图片识别算法中提到的两个标记位吗，就是fcpic和fspec，这两个标记位都有可能：
 可能图片对应的chpx根本就不在图片数据流中，因为之前看过另外一篇文档，貌似文本中的所有格式描述信息应该都是顺序排放的，那我们就直接在文本中搜索0x6a03,因为样本文本中是大端，所以应该搜索的是0x03 0x6a
 在偏移6ed7处找到一个，使用offvis查看：
 
-![img](img/in-post/post-doc/offvis1.png)
+![img](/img/in-post/post-doc/offvis1.png)
 
 下图中是对应的位置解析信息：
 
-![img](img/in-post/post-doc/offvis2.png)
+![img](/img/in-post/post-doc/offvis2.png)
 
 对应到sprmcpiclocation标记位的解析，后四位应该是图片的位置为00 00 0f 15,因为datastream的起始为0x8c00，0x8c00+0x0f15=0x9b15
 
-![img](img/in-post/post-doc/pic1.png)
+![img](/img/in-post/post-doc/pic1.png)
 
 可以看到offvis对该处的颜色分界，说明这里应该是一个单独的结构描述的起始，还记得前面介绍过的hug papx结构吗，FF 00就是这个结构的终止处。通过另外两个piclocation的值进行了验证，可以确定这个值应该就是相对datastream的偏移。
 

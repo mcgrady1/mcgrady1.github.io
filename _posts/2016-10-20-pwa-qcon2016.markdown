@@ -1,6 +1,5 @@
 ---
 layout:     post
-title:      ""
 title:      "关于AFL你想知道的事"
 subtitle:   "Project Summary"
 date:       2016-08-1 12:00:00

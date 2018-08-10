@@ -1,6 +1,5 @@
 ---
 layout:     post
-title:      ""
 title:      "What is MicroX"
 subtitle:   "Paper Summary"
 date:       2017-03-19 12:00:00
