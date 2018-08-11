@@ -17,7 +17,6 @@ tags:
 > Spark，Zookeeper加HDFS是我在做一个分布式项目时使用的工具，结合这三者的优势可以实现性能高，稳定性强的分布式平台，这里对之前的知识做一下总结，主要做面使用，请勿转载。
 
 
-
 # spark与hadoop对比
 
 Spark和hadoop都可以进行MapReduce的运算，简单的说就是如果一个问题可以划分成若干单元，每个单元的计算互不相关，单元计算结果可以在可以承受的时间内合成为总结果的计算，则该问题就可以归类为一个MapReduce运算。再说直白一点：所有分治模型都可交由hadoop解决。可以说spark是功能更全面的hadoop，支持一些诸如filter、group之类的操作，但是原本思想仍是map reduce，差别不太大。基本功能相似，但为什么Spark相对hadoop会有如此大的效率提升？下面我们首先分析这一点。
@@ -47,8 +46,6 @@ map产生的中间结果暂时保存在内存中，该缓冲区的默认大小�
 #### Hadoop的局限性
 
 - 表层上只提供了Map和Reduce两个操作，处理逻辑隐藏在代码中，整体逻辑不够清晰
-
-
 - 相对于Storm等流式框架，时延比较高，只适用于批数据处理，难以处理实时数据
 
 Apache Hadoop及其MapReduce处理引擎提供了一套久经考验的批处理模型，最适合处理对时间要求不高的非常大规模数据集。
@@ -123,11 +120,11 @@ Spark是多样化工作负载处理任务的最佳选择。Spark批处理能力�
 
 Hadoop分布式文件系统（HDFS）是一个高度容错性的系统，适合部署在廉价的机器上。HDFS能提供高吞吐量的数据访问，非常适合大规模数据集上的应用。HDFS放宽了一部分POSIX约束，来实现流式读取文件系统数据的目的。HDFS在最开始是作为Apache Nutch搜索引擎项目的基础架构而开发的。硬件错误是常态而不是偶尔的异常。因此错误检测和快速、自动的恢复是HDFS最核心的架构目标。运行在HDFS上的应用和普通的应用不同，需要流式访问它们的数据集。HDFS更多的考虑到了数据批处理，而不是用户交互处理。比之数据访问的低延迟问题，更关键的在于数据访问的高吞吐量。HDFS被调节以支持大文件存储。HDFS应用需要一个“一次写入多次读取”的文件访问模型。这一假设简化了数据一致性问题，并且使高吞吐量的数据访问成为可能。移动计算比移动数据更划算，在数据达到海量级别的时候更是如此。
 
-​         HDFS采用master/slave架构。一个HDFS集群是由一个Namenode和多个Datanodes组成。Namenode是一个中心服务器，负责管理文件系统的名字空间(namespace)以及客户端对文件的访问。集群中的Datanode一般是一个节点一个，负责管理它所在节点上的存储。
+​HDFS采用master/slave架构。一个HDFS集群是由一个Namenode和多个Datanodes组成。Namenode是一个中心服务器，负责管理文件系统的名字空间(namespace)以及客户端对文件的访问。集群中的Datanode一般是一个节点一个，负责管理它所在节点上的存储。
 
 ![img](https://img-blog.csdn.net/20160730172644499?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
-​         HDFS暴露了文件系统的名字空间，用户能够以文件的形式在上面存储数据。从内部看，一个文件其实被分成一个或多个数据块，这些块存储在一组Datanode上。Namenode执行文件系统的名字空间操作，比如打开、关闭、重命名文件或目录。它也负责确定数据块到具体Datanode节点的映射。Datanode负责处理文件系统客户端的读写请求。在Namenode的统一调度下进行数据块的创建、删除和复制。
+​HDFS暴露了文件系统的名字空间，用户能够以文件的形式在上面存储数据。从内部看，一个文件其实被分成一个或多个数据块，这些块存储在一组Datanode上。Namenode执行文件系统的名字空间操作，比如打开、关闭、重命名文件或目录。它也负责确定数据块到具体Datanode节点的映射。Datanode负责处理文件系统客户端的读写请求。在Namenode的统一调度下进行数据块的创建、删除和复制。
 
 **文件系统的名字空间**：HDFS支持传统的层次型文件组织结构。用户或者应用程序可以创建目录，然后将文件保存在这些目录里。
 
@@ -142,11 +139,11 @@ Hadoop分布式文件系统（HDFS）是一个高度容错性的系统，适合�
 
 Namenode在内存中保存着整个文件系统的名字空间和文件数据块映射(Blockmap)的映像。Datanode将HDFS数据以文件的形式存储在本地的文件系统中，它并不知道有关HDFS文件的信息。HDFS通讯协议都是建立在TCP/IP协议之上。HDFS的主要目标就是即使在出错的情况下也要保证数据存储的可靠性。常见的三种出错情况是：Namenode出错, Datanode出错和网络割裂(network partitions)。
 
-​         HDFS的架构支持数据均衡策略。FsImage和Editlog是HDFS的核心数据结构。如果这些文件损坏了，整个HDFS实例都将失效。因而，Namenode可以配置成支持维护多个FsImage和Editlog的副本。Namenode是HDFS集群中的单点故障(single point offailure)所在。如果Namenode机器故障，是需要手工干预的。
+​HDFS的架构支持数据均衡策略。FsImage和Editlog是HDFS的核心数据结构。如果这些文件损坏了，整个HDFS实例都将失效。因而，Namenode可以配置成支持维护多个FsImage和Editlog的副本。Namenode是HDFS集群中的单点故障(single point offailure)所在。如果Namenode机器故障，是需要手工干预的。
 
-​	Secondary NameNode的整个目的在HDFS中提供一个Checkpoint Node，通过阅读官方文档可以清晰的知道，它只是NameNode的一个助手节点。首先，它定时到NameNode去获取edits，并更新到fsimage上，一旦它有新的fsimage文件，它将其拷贝回NameNode上，NameNode在下次重启时回使用这个新的fsimage文件，从而减少重启的时间。所以，Secondary NameNode所做的是在文件系统这设置一个Checkpoint来帮助NameNode更好的工作；它不是取代NameNode，也不是NameNode的备份。　
+​Secondary NameNode的整个目的在HDFS中提供一个Checkpoint Node，通过阅读官方文档可以清晰的知道，它只是NameNode的一个助手节点。首先，它定时到NameNode去获取edits，并更新到fsimage上，一旦它有新的fsimage文件，它将其拷贝回NameNode上，NameNode在下次重启时回使用这个新的fsimage文件，从而减少重启的时间。所以，Secondary NameNode所做的是在文件系统这设置一个Checkpoint来帮助NameNode更好的工作；它不是取代NameNode，也不是NameNode的备份。　
 
-​	HDFS中的文件总是按照64M被切分成不同的块，每个块尽可能地存储于不同的Datanode中。HDFS以文件和目录的形式组织用户数据。它提供了一个命令行的接口(DFSShell)让用户与HDFS中的数据进行交互。一个HDFS集群主要由一个NameNode和很多个Datanode组成：Namenode管理文件系统的元数据，而Datanode存储了实际的数据。
+​HDFS中的文件总是按照64M被切分成不同的块，每个块尽可能地存储于不同的Datanode中。HDFS以文件和目录的形式组织用户数据。它提供了一个命令行的接口(DFSShell)让用户与HDFS中的数据进行交互。一个HDFS集群主要由一个NameNode和很多个Datanode组成：Namenode管理文件系统的元数据，而Datanode存储了实际的数据。
 
 ## Zookeeper
 
@@ -188,3 +185,9 @@ Slave节点运行着Worker、执行器和Driver程序，所以我们分三种情
 - Worker异常停止时，会先将自己启动的执行器停止，Driver需要有相应的程序来重启Worker进程。
 - 执行器异常退出时，Driver没有在规定时间内收到执行器的`StatusUpdate`，于是Driver会将注册的执行器移除，Worker收到`LaunchExecutor`指令，再次启动执行器。
 - Driver异常退出时，一般要使用检查点重启Driver，重新构造上下文并重启接收器。第一步，恢复检查点记录的元数据块。第二步，未完成作业的重新形成。由于失败而没有处理完成的RDD，将使用恢复的元数据重新生成RDD，然后运行后续的Job重新计算后恢复。
+
+## 参考资料
+hadoop资料 https://winway.github.io/2017/01/11/big-data-hdfs/
+hadoop基本组件 https://blog.csdn.net/Zonzereal/article/details/78095110
+spark stage、job介绍  https://www.jianshu.com/p/014cb82f462a
+
