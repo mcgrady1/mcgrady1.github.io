@@ -187,7 +187,9 @@ Slave节点运行着Worker、执行器和Driver程序，所以我们分三种情
 - Driver异常退出时，一般要使用检查点重启Driver，重新构造上下文并重启接收器。第一步，恢复检查点记录的元数据块。第二步，未完成作业的重新形成。由于失败而没有处理完成的RDD，将使用恢复的元数据重新生成RDD，然后运行后续的Job重新计算后恢复。
 
 ## 参考资料
-hadoop资料 https://winway.github.io/2017/01/11/big-data-hdfs/
-hadoop基本组件 https://blog.csdn.net/Zonzereal/article/details/78095110
-spark stage、job介绍  https://www.jianshu.com/p/014cb82f462a
+- hadoop资料 https://winway.github.io/2017/01/11/big-data-hdfs/
+- hadoop基本组件 https://blog.csdn.net/Zonzereal/article/details/78095110
+- Spark stage、job介绍  https://www.jianshu.com/p/014cb82f462a
+- Spark的容错机制 https://itunic.com/395.html
+- Spark任务调度 https://wongxingjun.github.io/2015/05/25/Spark%E4%BD%9C%E4%B8%9A%E8%B0%83%E5%BA%A6%E4%B8%ADstage%E7%9A%84%E5%88%92%E5%88%86/
 
